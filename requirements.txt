@@ -1,0 +1,2 @@
+# This package has no requirements other than builtins
+

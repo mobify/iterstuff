@@ -52,3 +52,12 @@ docs/_build/
 
 # PyBuilder
 target/
+
+# PyCharm
+.idea
+
+# Vagrant (we use them at Mobify to test)
+Vagrantfile
+vagrant/
+.vagrant
+
