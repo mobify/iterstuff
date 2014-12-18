@@ -17,23 +17,27 @@ and allows:
 
 We'll look at examples in a moment, but first here's a summary of usage:
 
+    ```python
     >>> # Create a generator that will yield three integers
     >>> g = xrange(3)
     >>> # Wrap it in a Lookahead
     >>> from iterstuff import Lookahead
     >>> x = Lookahead(g)
+    ```
     
 Now we can use the properties of the Lookahead to check whether we're at the
 start and/or end of the generator sequence, and to look at the next element
 that would be yielded:
 
+    ```python
     >>> x.atstart
     True
     >>> x.atend
     False
     >>> x.peek
     0
-    
+    ```
+
 Let's grab the first element and see how the properties change:
 
     >>> x.next()
