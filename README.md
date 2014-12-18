@@ -78,9 +78,7 @@ want to use it to break a sequence of characters into letters and digits.
 
     >>> from itertools import takewhile
     >>> # Build a generator that returns a sequence
-    >>> data = (x for x in 'abcd123ghi')
-    >>> type(data)
-    <type 'generator'>
+    >>> data = iter('abcd123ghi')
     >>>
     >>> # Ok, let's get the characters that are not digits
     >>> print list(takewhile(lambda x: not x.isdigit(), data))
