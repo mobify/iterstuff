@@ -88,10 +88,11 @@ want to use it to break a sequence of characters into letters and digits.
     >>> print list(takewhile(lambda x: x.isdigit(), data))
     ['2', '3']
 
-What happened to '1'? When we were taking the non-digits, the `takewhile`
-function took it from `data`, passed it to the `lambda` and when that returned
-False, terminated. But of course, by then the '1' had already been consumed,
-so when we started the second `takewhile`, the first character it got was '2'.
+What happened to '1'? When we were processing the non-digits, the `takewhile`
+function read the '1' from `data`, passed it to the `lambda` and when that
+returned False, terminated. But of course, by then the '1' had already been
+consumed, so when we started the second `takewhile`, the first character it
+got was '2'.
 
 We can solve this with a Lookahead. Here's a 'repeatable takewhile' equivalent
 (which is in the module):
