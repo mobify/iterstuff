@@ -1,3 +1,3 @@
-from batch import batch
-from lookahead import Lookahead, repeatable_takewhile
+from lookahead import Lookahead
+from recipes import batch, repeatable_takewhile, chunked
 

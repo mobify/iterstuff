@@ -1,8 +1,8 @@
 import string
 from unittest import TestCase
 
-from batch import batch
-from lookahead import Lookahead, repeatable_takewhile
+from recipes import batch, repeatable_takewhile, chunked
+from lookahead import Lookahead
 
 
 class LookaheadTest(TestCase):
@@ -62,37 +62,37 @@ class LookaheadTest(TestCase):
 
 class ChunkAndBatchTests(TestCase):
     def test_chunked(self):
-        r = map(list, Lookahead.chunked(""))
+        r = map(list, chunked(""))
         self.assertEqual(len(r), 0)
 
-        r = map(list, Lookahead.chunked("a"))
+        r = map(list, chunked("a"))
         self.assertEqual(len(r), 1)
         self.assertEqual(r[0][0], 'a')
         self.assertEqual(len(r[0]), 1)
 
-        r = map(list, Lookahead.chunked("aA", string.lower))
+        r = map(list, chunked("aA", string.lower))
         self.assertEqual(len(r), 1)
         r2 = r[0]
         self.assertEqual(len(r2), 2)
         self.assertEqual(r2, ['a', 'A'])
 
-        r = map(list, Lookahead.chunked("ab"))
+        r = map(list, chunked("ab"))
         self.assertEqual(len(r), 2)
         self.assertEqual(r[0], ['a'])
         self.assertEqual(r[1], ['b'])
 
-        r = map(list, Lookahead.chunked("aabcc"))
+        r = map(list, chunked("aabcc"))
         self.assertEqual(len(r), 3)
         self.assertEqual(r[0], list("aa"))
         self.assertEqual(r[1], list("b"))
         self.assertEqual(r[2], list("cc"))
 
-        r = map(list, Lookahead.chunked("abBbb", string.lower))
+        r = map(list, chunked("abBbb", string.lower))
         self.assertEqual(len(r), 2)
         self.assertEqual(r[0], ['a'])
         self.assertEqual(r[1], list("bBbb"))
 
-        r = map(list, Lookahead.chunked("abBbbC", string.lower))
+        r = map(list, chunked("abBbbC", string.lower))
         self.assertEqual(len(r), 3)
         self.assertEqual(r[0], ['a'])
         self.assertEqual(r[1], list("bBbb"))

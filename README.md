@@ -282,12 +282,13 @@ while not it.atend:
 ```
         
 But because this is a common use case, Lookahead has a helper function to
-make this even easier. The `Lookahead.chunked` staticmethod takes a function
+make this even easier. The `chunked` function takes a function
 to extract a 'key' value from each element, and yields successive
 iterables, each of which has records with the same key value.
 
 ```python
-for records_for_events in Lookahead.chunked(
+from iterstuff import chunked
+for records_for_events in chunked(
         records,
         lambda r: r.ID
     ):
@@ -300,7 +301,7 @@ In fact, we can use chunking in the character class problem we showed earlier:
 
 ```python
 >>> data = (x for x in 'abcd123ghi')
->>> for charset in Lookahead.chunked(data, lambda c: c.isdigit()):
+>>> for charset in chunked(data, lambda c: c.isdigit()):
 ...     print list(charset)
 ...     
 ['a', 'b', 'c', 'd']
@@ -392,3 +393,4 @@ Python generators are a wonderful, powerful, flexible language feature. The
 `atend` and `peek` properties of the Lookahead class enable a whole set of 
 simple recipes for working with generators.
 
+Re
