@@ -7,6 +7,10 @@ If the python2 `itertools` module is the Swiss Army Knife of functions for
 iterables, `iterstuff` is the cut-down single-blade version that you can keep on
 your keyring.
 
+You can install iterstuff from pypi using pip:
+
+    pip install iterstuff
+
 ## Lookahead
 
 The Lookahead class is the main feature of iterstuff. It 'wraps' an iterable
