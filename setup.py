@@ -1,32 +1,61 @@
 import os
 import os.path
-from setuptools import setup
+from setuptools import setup, find_packages
+
+# We cannot make link inside a development
+# vagrant box
+if os.environ.get('USER','') == 'vagrant':
+    del os.link
 
 PROJECT = 'iterstuff'
-VERSION = '0.0.1'
+VERSION = '1.0.0'
+PACKAGES = find_packages(exclude=['.vagrant', 'build', 'venv'])
 
 # The base path is the directory where setup.py lives
 BASE = os.path.abspath(os.path.dirname(__file__))
 DEPENDENCIES = os.path.join(BASE, 'dependencies.pip')
 
-setup(author='Mobify',
-      author_email='product@mobify.com',
-      name=PROJECT,
-      version=VERSION,
+setup(
+    author='Mobify',
+    author_email='product@mobify.com',
+    name=PROJECT,
+    version=VERSION,
+    packages=PACKAGES,
 
-      # Automatically generates a list of all the packages under the
-      # project directory.
-      packages=[
-          os.path.basename(d)
-          for d in (os.path.join(BASE, _) for _ in os.listdir(BASE))
-          if os.path.isdir(d) and os.path.exists(os.path.join(d, '__init__.py'))
-      ],
+    description='Useful tools for working with iterators',
+    keywords='iterator generator development',
+    url='https://github.com/mobify/iterstuff',
 
-      # Generates a list of required packages from dependencies.pip
-      install_requires=[
-          line
-          for line in (_.strip() for _ in open(DEPENDENCIES))
-          if line and (not line.startswith('#'))
-      ],
+    license='MIT',
 
-      zip_safe=True)
+    classifiers=[
+        # How mature is this project? Common values are
+        #   3 - Alpha
+        #   4 - Beta
+        #   5 - Production/Stable
+        'Development Status :: 5 - Production/Stable',
+
+        # Indicate who your project is intended for
+        'Intended Audience :: Developers',
+        'Topic :: Software Development :: Libraries',
+        'Topic :: Software Development :: Libraries :: Python Modules',
+
+        # Pick your license as you wish (should match "license" above)
+        'License :: OSI Approved :: MIT License',
+
+        # Specify the Python versions you support here. In particular, ensure
+        # that you indicate whether you support Python 2, Python 3 or both.
+        'Programming Language :: Python :: 2',
+        'Programming Language :: Python :: 2.6',
+        'Programming Language :: Python :: 2.7'
+    ],
+
+    # Generates a list of required packages from dependencies.pip
+    install_requires=[
+        line
+        for line in (_.strip() for _ in open(DEPENDENCIES))
+        if line and (not line.startswith('#'))
+    ],
+
+    zip_safe=True
+)
