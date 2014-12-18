@@ -18,6 +18,7 @@ class Lookahead(object):
         retrieved immediately.
         """
         self._g = iter(gen)
+        self._atend = False
         self._advance()
         self._atstart = True
 
