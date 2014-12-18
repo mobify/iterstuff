@@ -94,8 +94,8 @@ returned False, terminated. But of course, by then the '1' had already been
 consumed, so when we started the second `takewhile`, the first character it
 got was '2'.
 
-We can solve this with a Lookahead. Here's a 'repeatable takewhile' equivalent
-(which is in the module):
+We can solve this with a Lookahead. Here's a repeatable `takewhile` equivalent
+(that's in the `iterstuff` module):
 
     def repeatable_takewhile(predicate, iterable):
         """
@@ -117,13 +117,8 @@ We can solve this with a Lookahead. Here's a 'repeatable takewhile' equivalent
 
 Let's see how this behaves:
 
-    >>> from iterstuff import repeatable_takewhile
-    >>> data = Lookahead(iter('abcd123ghi'))
-    Traceback (most recent call last):
-      File "<input>", line 1, in <module>
-    NameError: name 'Lookahead' is not defined
     >>> from iterstuff import repeatable_takewhile, Lookahead
-    >>> data = Lookahead(x for x in 'abcd123ghi')
+    >>> data = Lookahead('abcd123ghi')
     >>> print list(repeatable_takewhile(lambda x: not x.isdigit(), data))
     ['a', 'b', 'c', 'd']
     >>> print list(repeatable_takewhile(lambda x: x.isdigit(), data))
@@ -233,8 +228,11 @@ iterate over the `records`:
     02 2014-12-17 01:00:01 DOMContentLoaded 64
     02 2014-12-17 01:00:01 Load 345
 
-We could use the `repeatable_takewhile` to grab all the records belonging
-to the same event:
+It's be better if we could handle all the records for one event together, then
+all the records for the next event, and so on.
+
+We could use `repeatable_takewhile` to grab all the records belonging to the
+same event:
 
     lah = Lookahead(records)
     
@@ -250,7 +248,7 @@ to the same event:
         # Now we have just the records for the next event
         ...process...
         
-Because this is a common use case, Lookahead has a helper function to
+But because this is a common use case, Lookahead has a helper function to
 make this even easier. The `Lookahead.chunked` staticmethod takes a function
 to extract a 'key' value from each element, and yields successive
 iterables, each of which has records with the same key value.
