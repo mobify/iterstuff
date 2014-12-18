@@ -394,4 +394,4 @@ Python generators are a wonderful, powerful, flexible language feature. The
 simple recipes for working with generators.
 
 You can see examples of use in the unit tests for this package, and run them
-with 
+by executing the `tests.py` file directly.
