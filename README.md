@@ -112,8 +112,8 @@ We can solve this with a Lookahead. Here's a repeatable `takewhile` equivalent
         # Use 'peek' to check if the next element will satisfy the
         # predicate, and yield while this is True, or until we reach
         # the end of the iterable.
-        while (not lah.atend) and predicate(lah.peek):
-            yield lah.next()
+        while (not iterable.atend) and predicate(iterable.peek):
+            yield iterable.next()
 
 Let's see how this behaves:
 
@@ -166,9 +166,9 @@ Lookahead:
 
     def pairwise(iterable):
         "s -> (s0,s1), (s1,s2), (s2, s3), ..."
-        lah = Lookahead(iterable)
-        while not lah.atend:
-            yield lah.next(), lah.peek
+        it = Lookahead(iterable)
+        while not it.atend:
+            yield it.next(), it.peek
 
 Let's try it:
 
@@ -234,14 +234,14 @@ all the records for the next event, and so on.
 We could use `repeatable_takewhile` to grab all the records belonging to the
 same event:
 
-    lah = Lookahead(records)
+    it = Lookahead(records)
     
-    while not lah.atend:
-        current_event_id = lah.peek.ID
+    while not it.atend:
+        current_event_id = it.peek.ID
         event_records = list(
             repeatable_takewhile(
                 lambda r: r.ID == current_event_id,
-                lah
+                it
             )
         )
         
@@ -277,8 +277,10 @@ The `batch` method is a simplification of a common use for `itertools.islice`.
 
 Suppose your generator yields records that you're reading from a file, or a
 database. Suppose that there may be many hundreds of thousands of records, or
-even millions, so you can't fit them all into memory. You need to do them in
+even millions, so you can't fit them all into memory, and you need to do them in
 batches of 1000.
+
+Here's one way to do this using `islice`:
 
     from itertools import islice
     CHUNK = 1000
@@ -293,7 +295,7 @@ batches of 1000.
         for record in chunk:
             process(record)
 
-Or the iterstuff `batch` function will do this for you:
+Or the iterstuff `batch` function will do this for you in a simpler way:
 
     from iterstuff import batch
     CHUNK = 1000
@@ -302,8 +304,7 @@ Or the iterstuff `batch` function will do this for you:
         for record in chunk:
             process(record)
     
-(For completeness, there's quite an elegant `batch` solution provided by Hamish
-Lawson for ActiveState recipes here:
+Hhere's an elegant `batch` solution provided by Hamish Lawson for ActiveState recipes:
 [http://code.activestate.com/recipes/303279-getting-items-in-batches/](http://code.activestate.com/recipes/303279-getting-items-in-batches/))
 
     from itertools import islice, chain
@@ -313,8 +314,29 @@ Lawson for ActiveState recipes here:
             batchiter = islice(sourceiter, size)
             yield chain([batchiter.next()], batchiter)
         
-See how this uses a call to `batchiter.next()` to cause `StopIteration` to be
+Note how this uses a call to `batchiter.next()` to cause `StopIteration` to be
 raised when the source iterable is exhausted. Because this consumes an element,
 `itertools.chain` needs to be used to 'push' that element back onto the head
 of the chunk. Using a Lookahead allows us to spot the end of the iterable and
-avoid having to do this.
+avoid having to do this.  Here's how `iterstuff.batch` works:
+
+    def batch(iterable, size):
+        # Wrap an enumeration of the iterable in a Lookahead so that it
+        # yields (count, element) tuples
+        it = Lookahead(enumerate(iterable))
+    
+        while not it.atend:
+            # Yield a generator that will yield up to
+            # 'size' elements from 'it'.
+    
+            # Set the start_count by checking the count value
+            # of the next element.
+            end_count = it.peek[0] + size
+            yield (
+                element
+                for counter, element in repeatable_takewhile(
+                    # t[0] is the count part of each element
+                    lambda t: t[0] < end_count,
+                    it
+                )
+            )

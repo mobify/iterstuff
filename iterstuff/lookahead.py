@@ -118,7 +118,7 @@ class Lookahead(object):
         """
         # Build a generator that return tuples of (element, key-of-element),
         # so that we only apply the key method to each element once.
-        lah = Lookahead((_x, f(_x)) for _x in i)
+        it = Lookahead((_x, f(_x)) for _x in i)
 
         def takechunk():
             """
@@ -131,23 +131,21 @@ class Lookahead(object):
             while True:
                 # Always yield the first element: if we're at the end of the
                 # generator, this will raise StopIteration and we're done.
-                (_x, key) = lah.next()
+                (_x, key) = it.next()
                 yield _x
 
                 # Check the lookahead's peek value to see if we should break now.
                 # We also break when we're at the end of the generator.
-                if lah.atend or key != lah.peek[1]:
+                if it.atend or key != it.peek[1]:
                     break
 
         # Yield successive instances of takechunk.
-        while not lah.atend:
+        while not it.atend:
             yield takechunk()
 
 
 def repeatable_takewhile(predicate, iterable):
     """
-    repeatable_takewhile(predicate, iterable) --> generator
-
     Return successive entries from an iterable as long as the
     predicate evaluates to true for each entry.
 

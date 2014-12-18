@@ -1,4 +1,4 @@
-from itertools import islice, chain
+from lookahead import Lookahead, repeatable_takewhile
 
 
 def batch(iterable, size):
@@ -15,12 +15,22 @@ def batch(iterable, size):
     @param iterable: an input iterable.
     @param size: the maximum number of items yielded by any output iterable.
     """
-    it = iter(iterable)
-    while True:
-        batchiter = islice(it, size)
+    # Wrap an enumeration of the iterable in a Lookahead so that it
+    # yields (count, element) tuples
+    it = Lookahead(enumerate(iterable))
 
-        # The call to next() is done so that when we have sliced to the
-        # end of the input and get an empty generator, StopIteration will
-        # be raised, and bubble up to be raised in batch(), and thus
-        # iteration over the whole batch will stop.
-        yield chain([next(batchiter)], batchiter)
+    while not it.atend:
+        # Yield a generator that will yield up to
+        # 'size' elements from 'it'.
+
+        # Set the start_count by checking the count value
+        # of the next element.
+        end_count = it.peek[0] + size
+        yield (
+            element
+            for counter, element in repeatable_takewhile(
+                # t[0] is the count part of each element
+                lambda t: t[0] < end_count,
+                it
+            )
+        )
