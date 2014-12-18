@@ -393,4 +393,5 @@ Python generators are a wonderful, powerful, flexible language feature. The
 `atend` and `peek` properties of the Lookahead class enable a whole set of 
 simple recipes for working with generators.
 
-Re
+You can see examples of use in the unit tests for this package, and run them
+with 

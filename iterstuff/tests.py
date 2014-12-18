@@ -1,11 +1,13 @@
+#!/usr/bin/env python
 import string
-from unittest import TestCase
+from unittest import TestCase, main
 
 from recipes import batch, repeatable_takewhile, chunked
 from lookahead import Lookahead
 
 
 class LookaheadTest(TestCase):
+
     def test_lookahead(self):
         l = Lookahead([])
         self.assertTrue(l.atstart)
@@ -34,6 +36,9 @@ class LookaheadTest(TestCase):
         self.assertEqual(list(l), [2, 3, 4, 5, 6, 7, 8, 9])
         self.assertTrue(l.atend)
 
+
+class RecipeTests(TestCase):
+
     def test_repeatable_takewhile(self):
         data = Lookahead(x for x in 'abcd123ghi')
 
@@ -59,8 +64,6 @@ class LookaheadTest(TestCase):
 
         self.assertEqual(list(data), list('ghi'))
 
-
-class ChunkAndBatchTests(TestCase):
     def test_chunked(self):
         r = map(list, chunked(""))
         self.assertEqual(len(r), 0)
@@ -110,3 +113,6 @@ class ChunkAndBatchTests(TestCase):
             else:
                 self.assertEqual(x[0], previous_list[-1]+1)
             previous_list = x
+
+if __name__ == '__main__':
+    main()
