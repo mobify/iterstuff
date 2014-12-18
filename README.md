@@ -17,61 +17,67 @@ and allows:
 
 We'll look at examples in a moment, but first here's a summary of usage:
 
-    ```python
-    >>> # Create a generator that will yield three integers
-    >>> g = xrange(3)
-    >>> # Wrap it in a Lookahead
-    >>> from iterstuff import Lookahead
-    >>> x = Lookahead(g)
-    ```
+```python
+>>> # Create a generator that will yield three integers
+>>> g = xrange(3)
+>>> # Wrap it in a Lookahead
+>>> from iterstuff import Lookahead
+>>> x = Lookahead(g)
+```
     
 Now we can use the properties of the Lookahead to check whether we're at the
 start and/or end of the generator sequence, and to look at the next element
 that would be yielded:
 
-    ```python
-    >>> x.atstart
-    True
-    >>> x.atend
-    False
-    >>> x.peek
-    0
-    ```
+```python
+>>> x.atstart
+True
+>>> x.atend
+False
+>>> x.peek
+0
+```
 
 Let's grab the first element and see how the properties change:
 
-    >>> x.next()
-    0
-    >>> x.atstart
-    False
-    >>> x.atend
-    False
-    x.peek
-    1
-    
+```python
+>>> x.next()
+0
+>>> x.atstart
+False
+>>> x.atend
+False
+x.peek
+1
+```
+
 We have two ways to iterate over a sequence wrapped in a Lookahead:
 
-    >>> # The usual way
-    >>> x = Lookahead(xrange(3))
-    >>> for y in x: print y
-    0
-    1
-    2
+```python
+>>> # The usual way
+>>> x = Lookahead(xrange(3))
+>>> for y in x: print y
+0
+1
+2
 
-    >>> # By checking for the end of the sequence
-    >>> x = Lookahead(xrange(3))
-    >>> while not x.atend:
-    ...     y = x.next()
-    ...     print y
-    ...     
-    0
-    1
-    2
+>>> # By checking for the end of the sequence
+>>> x = Lookahead(xrange(3))
+>>> while not x.atend:
+...     y = x.next()
+...     print y
+...     
+0
+1
+2
+```
 
 And we can detect a completely empty Lookahead:
 
-    >>> if x.atstart and x.atend:
-    ...    # x is an empty Lookahead
+```python
+>>> if x.atstart and x.atend:
+...    # x is an empty Lookahead
+```
 
 The obvious question is: _how is this useful?_
 
@@ -83,17 +89,19 @@ it only yields items up until the condition is no longer satisfied, then it
 stops, **after** testing the next element. Let's see what happens if we
 want to use it to break a sequence of characters into letters and digits.
 
-    >>> from itertools import takewhile
-    >>> # Build a generator that returns a sequence
-    >>> data = iter('abcd123ghi')
-    >>>
-    >>> # Ok, let's get the characters that are not digits
-    >>> print list(takewhile(lambda x: not x.isdigit(), data))
-    ['a', 'b', 'c', 'd']
-    >>> 
-    >>> # Great, now let's get the digits
-    >>> print list(takewhile(lambda x: x.isdigit(), data))
-    ['2', '3']
+```python
+>>> from itertools import takewhile
+>>> # Build a generator that returns a sequence
+>>> data = iter('abcd123ghi')
+>>>
+>>> # Ok, let's get the characters that are not digits
+>>> print list(takewhile(lambda x: not x.isdigit(), data))
+['a', 'b', 'c', 'd']
+>>> 
+>>> # Great, now let's get the digits
+>>> print list(takewhile(lambda x: x.isdigit(), data))
+['2', '3']
+```
 
 What happened to '1'? When we were processing the non-digits, the `takewhile`
 function read the '1' from `data`, passed it to the `lambda` and when that
@@ -104,32 +112,36 @@ got was '2'.
 We can solve this with a Lookahead. Here's a repeatable `takewhile` equivalent
 (that's in the `iterstuff` module):
 
-    def repeatable_takewhile(predicate, iterable):
-        """
-        Like itertools.takewhile, but does not consume the first
-        element of the iterable that fails the predicate test.
-        """
-        
-        # Assert that the iterable is a Lookahead. The act of wrapping
-        # an iterable in a Lookahead consumes the first element, so we
-        # cannot do the wrapping inside this function.
-        if not isinstance(iterable, Lookahead):
-            raise TypeError("The iterable parameter must be a Lookahead")
-        
-        # Use 'peek' to check if the next element will satisfy the
-        # predicate, and yield while this is True, or until we reach
-        # the end of the iterable.
-        while (not iterable.atend) and predicate(iterable.peek):
-            yield iterable.next()
+```python
+def repeatable_takewhile(predicate, iterable):
+    """
+    Like itertools.takewhile, but does not consume the first
+    element of the iterable that fails the predicate test.
+    """
+    
+    # Assert that the iterable is a Lookahead. The act of wrapping
+    # an iterable in a Lookahead consumes the first element, so we
+    # cannot do the wrapping inside this function.
+    if not isinstance(iterable, Lookahead):
+        raise TypeError("The iterable parameter must be a Lookahead")
+    
+    # Use 'peek' to check if the next element will satisfy the
+    # predicate, and yield while this is True, or until we reach
+    # the end of the iterable.
+    while (not iterable.atend) and predicate(iterable.peek):
+        yield iterable.next()
+```
 
 Let's see how this behaves:
 
-    >>> from iterstuff import repeatable_takewhile, Lookahead
-    >>> data = Lookahead('abcd123ghi')
-    >>> print list(repeatable_takewhile(lambda x: not x.isdigit(), data))
-    ['a', 'b', 'c', 'd']
-    >>> print list(repeatable_takewhile(lambda x: x.isdigit(), data))
-    ['1', '2', '3']
+```python
+>>> from iterstuff import repeatable_takewhile, Lookahead
+>>> data = Lookahead('abcd123ghi')
+>>> print list(repeatable_takewhile(lambda x: not x.isdigit(), data))
+['a', 'b', 'c', 'd']
+>>> print list(repeatable_takewhile(lambda x: x.isdigit(), data))
+['1', '2', '3']
+```
 
 ### Examine data before it's used
 
@@ -145,43 +157,51 @@ memory used (memory to hold the list plus memory to hold the DataFrame).
 A Lookahead allows code to peek ahead at the next row. So we could do the
 same job as *pandas* in a different way:
 
-    # Wrap the data in a Lookahead so we can peek at the first row
-    peekable = Lookahead(data)
+```python
+# Wrap the data in a Lookahead so we can peek at the first row
+peekable = Lookahead(data)
+
+# If we're at the end of the Lookahead, there's no data
+if peekable.atend:
+    return
     
-    # If we're at the end of the Lookahead, there's no data
-    if peekable.atend:
-        return
-        
-    # Grab the first row so we can look at the data types
-    first_row = peekable.peek
-    
-    # ...process the data types...
+# Grab the first row so we can look at the data types
+first_row = peekable.peek
+
+# ...process the data types...
+```
 
 ### Simple `pairwise`
     
 There's a beautiful recipe in the `itertools` documentation for yielding
 pairs from an iterable:
 
-    def pairwise(iterable):
-        "s -> (s0,s1), (s1,s2), (s2, s3), ..."
-        a, b = tee(iterable)
-        next(b, None)
-        return izip(a, b)
+```python
+def pairwise(iterable):
+    "s -> (s0,s1), (s1,s2), (s2, s3), ..."
+    a, b = tee(iterable)
+    next(b, None)
+    return izip(a, b)
+```
 
 Beautiful, but a little complex. We can make a simpler version with a
 Lookahead:
 
-    def pairwise(iterable):
-        "s -> (s0,s1), (s1,s2), (s2, s3), ..."
-        it = Lookahead(iterable)
-        while not it.atend:
-            yield it.next(), it.peek
+```python
+def pairwise(iterable):
+    "s -> (s0,s1), (s1,s2), (s2, s3), ..."
+    it = Lookahead(iterable)
+    while not it.atend:
+        yield it.next(), it.peek
+```
 
 Let's try it:
 
-    >>> data = iter('abcd123ghi')
-    >>> print list(pairwise(data))
-    [('a', 'b'), ('b', 'c'), ('c', 'd'), ('d', '1'), ('1', '2'), ('2', '3'), ('3', 'g'), ('g', 'h'), ('h', 'i'), ('i', None)]
+```python
+>>> data = iter('abcd123ghi')
+>>> print list(pairwise(data))
+[('a', 'b'), ('b', 'c'), ('c', 'd'), ('d', '1'), ('1', '2'), ('2', '3'), ('3', 'g'), ('g', 'h'), ('h', 'i'), ('i', None)]
+```
 
 ### Chunking
 
@@ -212,9 +232,11 @@ something like:
 At the end of every day, we process the records for that day, by doing a
 query like:
 
-    SELECT *
-    FROM Event LEFT OUTER JOIN Value ON Event.ID = Value.Event_ID
-    ORDER BY Event.ID
+```sql
+SELECT *
+FROM Event LEFT OUTER JOIN Value ON Event.ID = Value.Event_ID
+ORDER BY Event.ID
+```
 
 We'll probably end up with something like a SQLAlchemy `ResultProxy` or a
 Django `QuerySet` - an iterable thing that yields records (and here we're
@@ -225,8 +247,10 @@ memory). Let's call that iterable thing `records`.
 What we want to do is to process each event. The problem is that if we just
 iterate over the `records`:
 
-    for record in records:
-        print record.ID, record.Created, record.Name, record.Value
+```python
+for record in records:
+    print record.ID, record.Created, record.Name, record.Value
+```
 
 ...we'll get one record per **value** - more than one record per **event**:
 
@@ -241,42 +265,48 @@ all the records for the next event, and so on.
 We could use `repeatable_takewhile` to grab all the records belonging to the
 same event:
 
-    it = Lookahead(records)
-    
-    while not it.atend:
-        current_event_id = it.peek.ID
-        event_records = list(
-            repeatable_takewhile(
-                lambda r: r.ID == current_event_id,
-                it
-            )
+```python
+it = Lookahead(records)
+
+while not it.atend:
+    current_event_id = it.peek.ID
+    event_records = list(
+        repeatable_takewhile(
+            lambda r: r.ID == current_event_id,
+            it
         )
-        
-        # Now we have just the records for the next event
-        ...process...
+    )
+    
+    # Now we have just the records for the next event
+    ...process...
+```
         
 But because this is a common use case, Lookahead has a helper function to
 make this even easier. The `Lookahead.chunked` staticmethod takes a function
 to extract a 'key' value from each element, and yields successive
 iterables, each of which has records with the same key value.
 
-    for records_for_events in Lookahead.chunked(
-            records,
-            lambda r: r.ID
-        ):
-        # records_for_events is a sequence of records for
-        # one event.
-        ...process...
+```python
+for records_for_events in Lookahead.chunked(
+        records,
+        lambda r: r.ID
+    ):
+    # records_for_events is a sequence of records for
+    # one event.
+    ...process...
+```
 
 In fact, we can use chunking in the character class problem we showed earlier:
 
-    >>> data = (x for x in 'abcd123ghi')
-    >>> for charset in Lookahead.chunked(data, lambda c: c.isdigit()):
-    ...     print list(charset)
-    ...     
-    ['a', 'b', 'c', 'd']
-    ['1', '2', '3']
-    ['g', 'h', 'i']
+```python
+>>> data = (x for x in 'abcd123ghi')
+>>> for charset in Lookahead.chunked(data, lambda c: c.isdigit()):
+...     print list(charset)
+...     
+['a', 'b', 'c', 'd']
+['1', '2', '3']
+['g', 'h', 'i']
+```
 
 ## Batching
 
@@ -289,37 +319,43 @@ batches of 1000.
 
 Here's one way to do this using `islice`:
 
-    from itertools import islice
-    CHUNK = 1000
-    while True:
-        # Listify the records so that we can check if
-        # there were any returned.
-        chunk = list(islice(records, CHUNK))
-        if not chunk:
-            break
-        
-        # Process the records in this chunk
-        for record in chunk:
-            process(record)
+```python
+from itertools import islice
+CHUNK = 1000
+while True:
+    # Listify the records so that we can check if
+    # there were any returned.
+    chunk = list(islice(records, CHUNK))
+    if not chunk:
+        break
+    
+    # Process the records in this chunk
+    for record in chunk:
+        process(record)
+```
 
 Or the iterstuff `batch` function will do this for you in a simpler way:
 
-    from iterstuff import batch
-    CHUNK = 1000
-    for chunk in batch(records, CHUNK):
-        # Chunk is an iterable of up to CHUNK records
-        for record in chunk:
-            process(record)
+```python
+from iterstuff import batch
+CHUNK = 1000
+for chunk in batch(records, CHUNK):
+    # Chunk is an iterable of up to CHUNK records
+    for record in chunk:
+        process(record)
+```
     
 Here's an elegant `batch` solution provided by Hamish Lawson for ActiveState recipes:
 [http://code.activestate.com/recipes/303279-getting-items-in-batches/](http://code.activestate.com/recipes/303279-getting-items-in-batches/))
 
-    from itertools import islice, chain
-    def batch(iterable, size):
-        sourceiter = iter(iterable)
-        while True:
-            batchiter = islice(sourceiter, size)
-            yield chain([batchiter.next()], batchiter)
+```python
+from itertools import islice, chain
+def batch(iterable, size):
+    sourceiter = iter(iterable)
+    while True:
+        batchiter = islice(sourceiter, size)
+        yield chain([batchiter.next()], batchiter)
+```
         
 Note how this uses a call to `batchiter.next()` to cause `StopIteration` to be
 raised when the source iterable is exhausted. Because this consumes an element,
@@ -327,26 +363,28 @@ raised when the source iterable is exhausted. Because this consumes an element,
 of the chunk. Using a Lookahead allows us to peek at the next element of the
 iterable and avoid the push.  Here's how `iterstuff.batch` works:
 
-    def batch(iterable, size):
-        # Wrap an enumeration of the iterable in a Lookahead so that it
-        # yields (count, element) tuples
-        it = Lookahead(enumerate(iterable))
-    
-        while not it.atend:
-            # Set the end_count using the count value
-            # of the next element.
-            end_count = it.peek[0] + size
-    
-            # Yield a generator that will then yield up to
-            # 'size' elements from 'it'.
-            yield (
-                element
-                for counter, element in repeatable_takewhile(
-                    # t[0] is the count part of each element
-                    lambda t: t[0] < end_count,
-                    it
-                )
+```python
+def batch(iterable, size):
+    # Wrap an enumeration of the iterable in a Lookahead so that it
+    # yields (count, element) tuples
+    it = Lookahead(enumerate(iterable))
+
+    while not it.atend:
+        # Set the end_count using the count value
+        # of the next element.
+        end_count = it.peek[0] + size
+
+        # Yield a generator that will then yield up to
+        # 'size' elements from 'it'.
+        yield (
+            element
+            for counter, element in repeatable_takewhile(
+                # t[0] is the count part of each element
+                lambda t: t[0] < end_count,
+                it
             )
+        )
+```
 
 ## A Conclusion
 
