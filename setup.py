@@ -8,7 +8,7 @@ if os.environ.get('USER','') == 'vagrant':
     del os.link
 
 PROJECT = 'iterstuff'
-VERSION = '1.0.1'
+VERSION = '1.0.2'
 PACKAGES = find_packages(exclude=['.vagrant', 'build', 'venv'])
 
 # The base path is the directory where setup.py lives
