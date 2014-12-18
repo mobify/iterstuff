@@ -280,8 +280,6 @@ database. Suppose that there may be many hundreds of thousands of records, or
 even millions, so you can't fit them all into memory. You need to do them in
 batches of 1000.
 
-One way to iterate over the records would be something like:
-
     from itertools import islice
     CHUNK = 1000
     while True:
@@ -304,3 +302,19 @@ Or the iterstuff `batch` function will do this for you:
         for record in chunk:
             process(record)
     
+(For completeness, there's quite an elegant `batch` solution provided by Hamish
+Lawson for ActiveState recipes here:
+[http://code.activestate.com/recipes/303279-getting-items-in-batches/](http://code.activestate.com/recipes/303279-getting-items-in-batches/))
+
+    from itertools import islice, chain
+    def batch(iterable, size):
+        sourceiter = iter(iterable)
+        while True:
+            batchiter = islice(sourceiter, size)
+            yield chain([batchiter.next()], batchiter)
+        
+See how this uses a call to `batchiter.next()` to cause `StopIteration` to be
+raised when the source iterable is exhausted. Because this consumes an element,
+`itertools.chain` needs to be used to 'push' that element back onto the head
+of the chunk. Using a Lookahead allows us to spot the end of the iterable and
+avoid having to do this.
