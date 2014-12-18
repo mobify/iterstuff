@@ -20,12 +20,12 @@ def batch(iterable, size):
     it = Lookahead(enumerate(iterable))
 
     while not it.atend:
-        # Yield a generator that will yield up to
-        # 'size' elements from 'it'.
-
-        # Set the start_count by checking the count value
+        # Set the end_count using the count value
         # of the next element.
         end_count = it.peek[0] + size
+
+        # Yield a generator that will then yield up to
+        # 'size' elements from 'it'.
         yield (
             element
             for counter, element in repeatable_takewhile(

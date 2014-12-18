@@ -304,7 +304,7 @@ Or the iterstuff `batch` function will do this for you in a simpler way:
         for record in chunk:
             process(record)
     
-Hhere's an elegant `batch` solution provided by Hamish Lawson for ActiveState recipes:
+Here's an elegant `batch` solution provided by Hamish Lawson for ActiveState recipes:
 [http://code.activestate.com/recipes/303279-getting-items-in-batches/](http://code.activestate.com/recipes/303279-getting-items-in-batches/))
 
     from itertools import islice, chain
@@ -317,8 +317,8 @@ Hhere's an elegant `batch` solution provided by Hamish Lawson for ActiveState re
 Note how this uses a call to `batchiter.next()` to cause `StopIteration` to be
 raised when the source iterable is exhausted. Because this consumes an element,
 `itertools.chain` needs to be used to 'push' that element back onto the head
-of the chunk. Using a Lookahead allows us to spot the end of the iterable and
-avoid having to do this.  Here's how `iterstuff.batch` works:
+of the chunk. Using a Lookahead allows us to peek at the next element of the
+iterable and avoid the push.  Here's how `iterstuff.batch` works:
 
     def batch(iterable, size):
         # Wrap an enumeration of the iterable in a Lookahead so that it
@@ -326,12 +326,12 @@ avoid having to do this.  Here's how `iterstuff.batch` works:
         it = Lookahead(enumerate(iterable))
     
         while not it.atend:
-            # Yield a generator that will yield up to
-            # 'size' elements from 'it'.
-    
-            # Set the start_count by checking the count value
+            # Set the end_count using the count value
             # of the next element.
             end_count = it.peek[0] + size
+    
+            # Yield a generator that will then yield up to
+            # 'size' elements from 'it'.
             yield (
                 element
                 for counter, element in repeatable_takewhile(
@@ -340,3 +340,10 @@ avoid having to do this.  Here's how `iterstuff.batch` works:
                     it
                 )
             )
+
+## A Conclusion
+
+Python generators are a wonderful, powerful, flexible language feature. The
+`atend` and `peek` properties of the Lookahead class enable a whole set of 
+simple recipes for working with generators.
+
