@@ -2,7 +2,7 @@ import string
 from unittest import TestCase
 
 from batch import batch
-from lookahead import Lookahead
+from lookahead import Lookahead, repeatable_takewhile
 
 
 class LookaheadTest(TestCase):
@@ -33,6 +33,31 @@ class LookaheadTest(TestCase):
         self.assertFalse(l.atend)
         self.assertEqual(list(l), [2, 3, 4, 5, 6, 7, 8, 9])
         self.assertTrue(l.atend)
+
+    def test_repeatable_takewhile(self):
+        data = Lookahead(x for x in 'abcd123ghi')
+
+        self.assertEqual(
+            list(
+                repeatable_takewhile(
+                    lambda x: not x.isdigit(),
+                    data
+                )
+            ),
+            list('abcd')
+        )
+
+        self.assertEqual(
+            list(
+                repeatable_takewhile(
+                    lambda x: x.isdigit(),
+                    data
+                )
+            ),
+            list('123')
+        )
+
+        self.assertEqual(list(data), list('ghi'))
 
 
 class ChunkAndBatchTests(TestCase):

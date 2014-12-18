@@ -142,3 +142,31 @@ class Lookahead(object):
         # Yield successive instances of takechunk.
         while not lah.atend:
             yield takechunk()
+
+
+def repeatable_takewhile(predicate, iterable):
+    """
+    repeatable_takewhile(predicate, iterable) --> generator
+
+    Return successive entries from an iterable as long as the
+    predicate evaluates to true for each entry.
+
+    Like itertools.takewhile, but does not consume the first
+    element of the iterable that fails the predicate test.
+
+    :param predicate: a single-element callable that returns True
+    for elements that satisfy a condition, False for those that
+    do not.
+    :param iterable: must be a Lookahead
+    """
+    # Assert that the iterable is a Lookahead. The act of wrapping
+    # an iterable in a Lookahead consumes the first element, so we
+    # cannot do the wrapping inside this function.
+    if not isinstance(iterable, Lookahead):
+        raise TypeError("The iterable parameter must be a Lookahead")
+
+    # Use 'peek' to check if the next element will satisfy the
+    # predicate, and yield while this is True, or until we reach
+    # the end of the iterable.
+    while (not iterable.atend) and predicate(iterable.peek):
+        yield iterable.next()
