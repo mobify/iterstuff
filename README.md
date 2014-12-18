@@ -3,21 +3,19 @@ iterstuff
 
 **Useful tools for working with iterators**
 
-This package contains three useful tools to work with iterables in Python. They're
-most useful for generators.
-
 If the python2 `itertools` module is the Swiss Army Knife of functions for
-iterables, `iterstuff` is the cut-down 2-blade version that you can keep on
+iterables, `iterstuff` is the cut-down single-blade version that you can keep on
 your keyring.
 
 ## Lookahead
 
-The Lookahead class 'wraps' an iterable and allows:
+The Lookahead class is the main feature of iterstuff. It 'wraps' an iterable
+and allows:
 
 * Detection of the end of the generator using the `atend` property
 * 'Peeking' at the next item to be yielded using the `peek` property
 
-We'll look at use-cases in a moment, but first usage:
+We'll look at examples in a moment, but first here's a summary of usage:
 
     >>> # Create a generator that will yield three integers
     >>> g = xrange(3)
@@ -66,7 +64,12 @@ We have two ways to iterate over a sequence wrapped in a Lookahead:
     1
     2
 
-The obvious question is: _why is this useful?_
+And we can detect a completely empty Lookahead:
+
+    >>> if x.atstart and x.atend:
+    ...    # x is an empty Lookahead
+
+The obvious question is: _how is this useful?_
 
 ### Repeating a `takewhile`
 
