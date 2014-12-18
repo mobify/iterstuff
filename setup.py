@@ -50,12 +50,7 @@ setup(
         'Programming Language :: Python :: 2.7'
     ],
 
-    # Generates a list of required packages from dependencies.pip
-    install_requires=[
-        line
-        for line in (_.strip() for _ in open(DEPENDENCIES))
-        if line and (not line.startswith('#'))
-    ],
+    install_requires=[],
 
     zip_safe=True
 )
