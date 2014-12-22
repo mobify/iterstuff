@@ -19,6 +19,11 @@ and allows:
 * Detection of the end of the generator using the `atend` property
 * 'Peeking' at the next item to be yielded using the `peek` property
 
+Note that 'wrapping' means that the Lookahead will advance the wrapped iterable (by calling
+`next`) as needed. As per the comments on the Lookahead `__init__`, creating
+the Lookahead will advance to the first element of the wrapped iterable immediately.
+After that, iterating over the Lookahead will also iterate over the wrapped iterable.
+
 We'll look at examples in a moment, but first here's a summary of usage:
 
 ```python
