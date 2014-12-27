@@ -1,3 +1,5 @@
+import six
+
 class Lookahead(object):
     """
     A Lookahead is a wrapper for any generator that lets you look at the
@@ -28,7 +30,7 @@ class Lookahead(object):
         """
         try:
             self._atstart = False
-            self._x = self._g.next()
+            self._x = six.advance_iterator(self._g)
         except StopIteration:
             self._x = None
             self._atend = True
