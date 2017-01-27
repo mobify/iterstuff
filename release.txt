@@ -1,0 +1,7 @@
+Run the tests
+Bump the version number
+
+docker run -it \
+    -v $(pwd):/app \
+    iterstuff:python2 \
+    /bin/bash -l -c 'cd /app && /venv/bin/python setup.py sdist && /venv/bin/twine upload dist/*'

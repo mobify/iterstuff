@@ -2,13 +2,8 @@ import os
 import os.path
 from setuptools import setup, find_packages
 
-# We cannot make link inside a development
-# vagrant box
-if os.environ.get('USER','') == 'vagrant':
-    del os.link
-
 PROJECT = 'iterstuff'
-VERSION = '1.0.2'
+VERSION = '1.0.3'
 PACKAGES = find_packages(exclude=['.vagrant', 'build', 'venv'])
 
 # The base path is the directory where setup.py lives
@@ -47,7 +42,9 @@ setup(
         # that you indicate whether you support Python 2, Python 3 or both.
         'Programming Language :: Python :: 2',
         'Programming Language :: Python :: 2.6',
-        'Programming Language :: Python :: 2.7'
+        'Programming Language :: Python :: 2.7',
+        'Programming Language :: Python :: 3',
+        'Programming Language :: Python :: 3.5'
     ],
 
     install_requires=[],

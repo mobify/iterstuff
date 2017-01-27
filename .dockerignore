@@ -1,0 +1,9 @@
+# Created by .ignore support plugin (hsz.mobi)
+docker/
+venv/
+build_and_run_tests.sh
+LICENSE
+MANIFEST.in
+README.md
+setup.py
+.idea/

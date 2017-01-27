@@ -404,3 +404,8 @@ simple recipes for working with generators.
 
 You can see examples of use in the unit tests for this package, and run them
 by executing the `tests.py` file directly.
+
+## Thanks
+...to the Engineering Gang at Mobify
+...to https://github.com/landonjross for Python3 support
+
