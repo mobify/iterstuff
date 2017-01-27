@@ -1,9 +1,19 @@
 #!/usr/bin/env python
-import string
+from __future__ import absolute_import
+
+import six
+from six.moves import range
+from six.moves import map
+
+if six.PY2:
+    from string import lower
+else:
+    lower = str.lower
+
 from unittest import TestCase, main
 
-from recipes import batch, repeatable_takewhile, chunked
-from lookahead import Lookahead
+from iterstuff.recipes import batch, repeatable_takewhile, chunked
+from iterstuff.lookahead import Lookahead
 
 
 class LookaheadTest(TestCase):
@@ -65,44 +75,44 @@ class RecipeTests(TestCase):
         self.assertEqual(list(data), list('ghi'))
 
     def test_chunked(self):
-        r = map(list, chunked(""))
+        r = list(map(list, chunked("")))
         self.assertEqual(len(r), 0)
 
-        r = map(list, chunked("a"))
+        r = list(map(list, chunked("a")))
         self.assertEqual(len(r), 1)
         self.assertEqual(r[0][0], 'a')
         self.assertEqual(len(r[0]), 1)
 
-        r = map(list, chunked("aA", string.lower))
+        r = list(map(list, chunked("aA", lower)))
         self.assertEqual(len(r), 1)
         r2 = r[0]
         self.assertEqual(len(r2), 2)
         self.assertEqual(r2, ['a', 'A'])
 
-        r = map(list, chunked("ab"))
+        r = list(map(list, chunked("ab")))
         self.assertEqual(len(r), 2)
         self.assertEqual(r[0], ['a'])
         self.assertEqual(r[1], ['b'])
 
-        r = map(list, chunked("aabcc"))
+        r = list(map(list, chunked("aabcc")))
         self.assertEqual(len(r), 3)
         self.assertEqual(r[0], list("aa"))
         self.assertEqual(r[1], list("b"))
         self.assertEqual(r[2], list("cc"))
 
-        r = map(list, chunked("abBbb", string.lower))
+        r = list(map(list, chunked("abBbb", lower)))
         self.assertEqual(len(r), 2)
         self.assertEqual(r[0], ['a'])
         self.assertEqual(r[1], list("bBbb"))
 
-        r = map(list, chunked("abBbbC", string.lower))
+        r = list(map(list, chunked("abBbbC", lower)))
         self.assertEqual(len(r), 3)
         self.assertEqual(r[0], ['a'])
         self.assertEqual(r[1], list("bBbb"))
         self.assertEqual(r[2], ['C'])
 
     def test_batching(self):
-        seq = xrange(19)
+        seq = range(19)
         previous_list = None
         for batchiter in batch(seq, 3):
             x = list(batchiter)

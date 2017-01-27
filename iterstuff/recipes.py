@@ -1,4 +1,5 @@
-from lookahead import Lookahead
+from __future__ import absolute_import
+from iterstuff.lookahead import Lookahead
 
 
 def repeatable_takewhile(predicate, iterable):
